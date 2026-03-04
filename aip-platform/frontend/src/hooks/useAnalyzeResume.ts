@@ -1,52 +1,18 @@
-import { useState } from 'react';
-import type { AnalyzePayload, AnalyzeResponse } from '@/types/analysis';
-import type { ResumeUploadResponse, RewriteResponse } from '@/types/resume';
+import { useMutation } from '@tanstack/react-query';
+import type { AnalyzePayload } from '@/types/analysis';
 import { analyzeResume, rewriteResume, uploadResume } from '@/services/resumeService';
 
-export const useUploadResume = () => {
-  const [isPending, setIsPending] = useState(false);
+export const useUploadResume = () =>
+  useMutation({
+    mutationFn: uploadResume
+  });
 
-  const mutateAsync = async (file: File): Promise<ResumeUploadResponse> => {
-    setIsPending(true);
-    try {
-      return await uploadResume(file);
-    } finally {
-      setIsPending(false);
-    }
-  };
+export const useAnalyzeResume = () =>
+  useMutation({
+    mutationFn: (payload: AnalyzePayload) => analyzeResume(payload)
+  });
 
-  return { isPending, mutateAsync };
-};
-
-export const useAnalyzeResume = () => {
-  const [isPending, setIsPending] = useState(false);
-
-  const mutateAsync = async (payload: AnalyzePayload): Promise<AnalyzeResponse> => {
-    setIsPending(true);
-    try {
-      return await analyzeResume(payload);
-    } finally {
-      setIsPending(false);
-    }
-  };
-
-  return { isPending, mutateAsync };
-};
-
-export const useRewriteResume = () => {
-  const [isPending, setIsPending] = useState(false);
-  const [data, setData] = useState<RewriteResponse | undefined>(undefined);
-
-  const mutateAsync = async (payload: AnalyzePayload): Promise<RewriteResponse> => {
-    setIsPending(true);
-    try {
-      const response = await rewriteResume(payload);
-      setData(response);
-      return response;
-    } finally {
-      setIsPending(false);
-    }
-  };
-
-  return { isPending, data, mutateAsync };
-};
+export const useRewriteResume = () =>
+  useMutation({
+    mutationFn: (payload: AnalyzePayload) => rewriteResume(payload)
+  });

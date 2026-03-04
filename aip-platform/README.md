@@ -1,82 +1,70 @@
 # ATS Intelligence Platform (AIP)
 
-AIP helps job seekers optimize resumes for ATS with score, keyword gaps, and AI rewrite.
+AIP is an AI-powered prototype that helps job seekers optimize resumes for Applicant Tracking Systems (ATS).
 
-## Run locally
+## Features
 
-### Backend
+- Upload resume PDFs and extract text.
+- Analyze resume alignment with a job description.
+- Generate ATS compatibility score.
+- Show matched and missing keywords.
+- Rewrite resume content using OpenAI for ATS optimization.
+- Download optimized resume as a text file.
+
+## Monorepo Structure
+
+```
+aip-platform/
+  frontend/   # React + Vite + Tailwind client
+  backend/    # Express + TypeScript API
+  shared/     # Shared artifacts (placeholder for future use)
+  docs/       # Additional project docs
+```
+
+## Prerequisites
+
+- Node.js 18+
+- npm 9+
+- OpenAI API key (for rewrite endpoint)
+
+## Setup
+
+### 1) Backend
+
 ```bash
-cd aip-platform/backend
+cd backend
+npm install
+cp .env.example .env
+# set OPENAI_API_KEY in .env
+npm run dev
+```
+
+Backend runs on `http://localhost:4000`.
+
+### 2) Frontend
+
+```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-### Frontend
-```bash
-cd aip-platform/frontend
-npm install
-npm run dev
-```
+Frontend runs on `http://localhost:5173`.
 
-Open: `http://localhost:5173`
+## Environment Variables
 
-## Deploy on Vercel (single project)
+Backend `.env`:
 
-This repository is configured so Vercel serves a root static app (`/index.html` + `/app.js`) and serverless APIs together.
+- `PORT=4000`
+- `OPENAI_API_KEY=your_key`
+- `OPENAI_MODEL=gpt-4o-mini` (optional)
+- `MAX_UPLOAD_MB=5` (optional)
+- `CORS_ORIGIN=http://localhost:5173` (optional)
 
-### 1) Import project in Vercel
-- Git repo: `Soumyad18/AIP`
-- Framework preset: **Other**
-- Root directory: `./` (repo root)
+## Core API
 
-### 2) Environment variables (Project Settings → Environment Variables)
-- `OPENAI_API_KEY` = your OpenAI key (optional but recommended)
-- `OPENAI_MODEL` = `gpt-4o-mini` (optional)
-- `MAX_UPLOAD_MB` = `5` (optional)
+- `POST /api/resume/upload` - Upload PDF and extract resume text.
+- `POST /api/analyze` - Compute ATS score + keyword alignment.
+- `POST /api/rewrite` - Generate optimized resume rewrite.
 
-### 3) Deploy
-Click **Deploy**.
-
-### 4) Test deployed flow
-- Open your deployed URL.
-- Use homepage auth entry buttons (login/signup/enterprise).
-- Scroll to Resume Analyzer.
-- Upload PDF, paste JD, click **Analyze Resume**.
-- Click **Optimize Resume** and **Download**.
-
-### 5) Quick API checks
-Replace `<your-vercel-url>`:
-
-```bash
-curl https://<your-vercel-url>/api/health
-curl -X POST https://<your-vercel-url>/api/analyze \
-  -H 'Content-Type: application/json' \
-  -d '{"resumeText":"React TypeScript Node","jobDescription":"Need React TypeScript Node and Docker"}'
-```
-
-## Notes
-- If `OPENAI_API_KEY` is not set, rewrite uses local fallback text generation.
-- Frontend uses `http://localhost:4000/api` on localhost and `/api` when deployed.
-
-
-## SaaS App Routes
-
-- `/` public marketing landing page
-- `/login` authentication page
-- `/signup` registration page
-- `/dashboard` protected product dashboard
-- `/analyzer` protected resume analyzer tool
-
-Protected routes redirect unauthenticated users to `/login`.
-
-
-## Deployment Refresh Troubleshooting
-
-If production still shows an old UI after merge:
-
-1. In Vercel Deployments, confirm **Source commit** is your latest merged commit.
-2. Click **Redeploy** on the latest deployment.
-3. Hard refresh browser (`Ctrl/Cmd + Shift + R`).
-4. Open in incognito to bypass local cache.
-
-This repo now sends `no-store` cache headers for `index.html`, `app.js`, and `/src/*` on Vercel.
+For full details, see `API_SPEC.md`.
