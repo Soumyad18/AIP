@@ -1,9 +1,10 @@
 {
   "rewrites": [
+    { "source": "/", "destination": "/aip-platform/frontend/index.html" },
+    { "source": "/src/app.js", "destination": "/aip-platform/frontend/src/app.js" },
     { "source": "/api/resume/upload", "destination": "/api/resume/upload" },
     { "source": "/api/analyze", "destination": "/api/analyze" },
     { "source": "/api/rewrite", "destination": "/api/rewrite" },
-    { "source": "/api/health", "destination": "/api/health" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/api/health", "destination": "/api/health" }
   ]
 }
