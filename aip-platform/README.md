@@ -1,52 +1,70 @@
 # ATS Intelligence Platform (AIP)
 
-AIP is a working prototype that helps job seekers optimize resumes for Applicant Tracking Systems (ATS).
+AIP is an AI-powered prototype that helps job seekers optimize resumes for Applicant Tracking Systems (ATS).
 
-## What you can do
+## Features
 
-- Upload a resume PDF.
-- Paste a job description.
+- Upload resume PDFs and extract text.
+- Analyze resume alignment with a job description.
 - Generate ATS compatibility score.
-- See matched and missing keywords.
-- Optimize the resume with AI rewrite.
-- Download optimized resume as text.
+- Show matched and missing keywords.
+- Rewrite resume content using OpenAI for ATS optimization.
+- Download optimized resume as a text file.
 
-## Run the application (no dependency install required)
+## Monorepo Structure
 
-This version is built to run in restricted environments.
+```
+aip-platform/
+  frontend/   # React + Vite + Tailwind client
+  backend/    # Express + TypeScript API
+  shared/     # Shared artifacts (placeholder for future use)
+  docs/       # Additional project docs
+```
 
-### 1) Start backend (port 4000)
+## Prerequisites
+
+- Node.js 18+
+- npm 9+
+- OpenAI API key (for rewrite endpoint)
+
+## Setup
+
+### 1) Backend
 
 ```bash
-cd aip-platform/backend
+cd backend
+npm install
+cp .env.example .env
+# set OPENAI_API_KEY in .env
 npm run dev
 ```
 
-### 2) Start frontend (port 5173)
+Backend runs on `http://localhost:4000`.
+
+### 2) Frontend
 
 ```bash
-cd aip-platform/frontend
+cd frontend
+npm install
 npm run dev
 ```
 
-### 3) Open app
+Frontend runs on `http://localhost:5173`.
 
-- `http://localhost:5173`
+## Environment Variables
 
-## OpenAI (optional)
-
-If `OPENAI_API_KEY` is set for backend, `/api/rewrite` uses OpenAI.
-If not set, backend uses a local ATS-friendly fallback rewrite so demo still works.
-
-Environment variables for backend:
+Backend `.env`:
 
 - `PORT=4000`
-- `OPENAI_API_KEY=`
-- `OPENAI_MODEL=gpt-4o-mini`
-- `MAX_UPLOAD_MB=5`
+- `OPENAI_API_KEY=your_key`
+- `OPENAI_MODEL=gpt-4o-mini` (optional)
+- `MAX_UPLOAD_MB=5` (optional)
+- `CORS_ORIGIN=http://localhost:5173` (optional)
 
-## API
+## Core API
 
-- `POST /api/resume/upload`
-- `POST /api/analyze`
-- `POST /api/rewrite`
+- `POST /api/resume/upload` - Upload PDF and extract resume text.
+- `POST /api/analyze` - Compute ATS score + keyword alignment.
+- `POST /api/rewrite` - Generate optimized resume rewrite.
+
+For full details, see `API_SPEC.md`.
