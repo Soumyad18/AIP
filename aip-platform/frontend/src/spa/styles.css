@@ -1,0 +1,43 @@
+:root {
+  --primary: #26A688;
+  --secondary-1: #DDF8F2;
+  --secondary-2: #B4EEE0;
+  --heading: #333F70;
+  --body: #333F70;
+  --bg: #D6F5EE;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--body)}
+a{text-decoration:none;color:inherit}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+.card{background:#fff;border:1px solid #d7e6e2;border-radius:16px;box-shadow:0 6px 18px rgba(25,34,72,.08)}
+.btn{padding:10px 16px;border-radius:10px;border:1px solid var(--primary);font-weight:700;cursor:pointer}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-secondary{background:#fff;color:var(--primary)}
+.nav{background:#fff;border-bottom:1px solid #d2e6e0;position:sticky;top:0;z-index:20}
+.nav-inner{height:72px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:'Unbounded',sans-serif;font-weight:700;color:var(--heading)}
+.hero{padding:64px 0 32px;text-align:center}
+h1,h2,h3,h4{font-family:'Unbounded',sans-serif;color:var(--heading);margin:0 0 12px}
+.hero p{max-width:760px;margin:0 auto 20px}
+.grid{display:grid;gap:16px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.feature{padding:18px}
+.footer{margin-top:40px;padding:24px 0;border-top:1px solid #cce8e0;text-align:center}
+.auth-wrap{min-height:calc(100vh - 72px);display:grid;place-items:center;padding:20px}
+.auth-card{width:min(440px,94vw);padding:22px}
+.input{width:100%;padding:11px;border:1px solid #b8d7cf;border-radius:10px;margin:8px 0 14px;background:#fff}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:#192248;color:#fff;padding:18px}
+.side-item{display:block;padding:10px;border-radius:8px;margin:5px 0;color:#d8e5ff}
+.side-item.active,.side-item:hover{background:#26346c;color:#fff}
+.main{padding:24px}
+.cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pad{padding:16px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+textarea{min-height:180px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#ecf8f4;border:1px solid #bde8dd;border-radius:999px;padding:4px 10px;font-size:12px}
+.error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;padding:10px;border-radius:10px}
+@media(max-width:900px){.grid-3,.cards4,.row2,.layout{grid-template-columns:1fr}.sidebar{position:sticky;top:0;z-index:10}}
