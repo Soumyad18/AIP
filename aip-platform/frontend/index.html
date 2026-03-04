@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AIP - ATS Intelligence Platform</title>
+    <style>
+      body { font-family: Arial, sans-serif; background:#f8fafc; margin:0; color:#0f172a; }
+      .wrap{ max-width:1100px; margin:0 auto; padding:24px; }
+      .card{ background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px; }
+      textarea{ width:100%; min-height:180px; padding:10px; border:1px solid #cbd5e1; border-radius:8px; }
+      button{ background:#1d4ed8; color:#fff; border:none; border-radius:8px; padding:10px 14px; cursor:pointer; }
+      button:disabled{ opacity:.6; cursor:not-allowed; }
+      .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+      .chip{ background:#f1f5f9; border-radius:999px; padding:4px 10px; font-size:12px; }
+      .row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+      .err{ background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:10px; border-radius:8px; }
+      pre{ white-space:pre-wrap; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; max-height:360px; overflow:auto; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>ATS Intelligence Platform (AIP)</h1>
+      <p>Upload resume PDF, analyze ATS alignment, and optimize rewrite.</p>
+
+      <div class="card">
+        <label><b>Resume Upload (PDF)</b></label><br /><br />
+        <input type="file" id="resumeFile" accept="application/pdf" />
+        <p id="resumeStatus"></p>
+      </div>
+
+      <div class="card">
+        <label><b>Job Description</b></label>
+        <textarea id="jobDescription" placeholder="Paste job description..."></textarea>
+      </div>
+
+      <button id="analyzeBtn">Analyze Resume</button>
+      <p id="loading"></p>
+      <div id="error"></div>
+
+      <div id="results" style="display:none; margin-top:16px;">
+        <div class="row">
+          <div class="card"><h3>ATS Score</h3><p id="score" style="font-size:34px;color:#1d4ed8;font-weight:bold"></p></div>
+          <div class="card"><h3>Matched Keywords</h3><div id="matched" class="chips"></div></div>
+        </div>
+        <div class="card"><h3>Missing Skills</h3><div id="missing" class="chips"></div></div>
+
+        <div class="card">
+          <h3>AI Resume Optimization</h3>
+          <button id="optimizeBtn">Optimize Resume</button>
+          <div id="optimizedWrap" style="display:none;margin-top:12px;">
+            <button id="downloadBtn">Download Optimized Resume</button>
+            <pre id="optimizedText"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>
