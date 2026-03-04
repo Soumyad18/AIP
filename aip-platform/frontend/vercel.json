@@ -1,0 +1,19 @@
+{
+  "headers": [
+    {
+      "source": "/index.html",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }]
+    },
+    {
+      "source": "/app.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }]
+    },
+    {
+      "source": "/src/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }]
+    }
+  ],
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
