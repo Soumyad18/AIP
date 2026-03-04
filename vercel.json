@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/api/resume/upload", "destination": "/api/resume/upload" },
+    { "source": "/api/analyze", "destination": "/api/analyze" },
+    { "source": "/api/rewrite", "destination": "/api/rewrite" },
+    { "source": "/api/health", "destination": "/api/health" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
