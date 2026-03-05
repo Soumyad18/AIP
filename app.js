@@ -1,98 +1,175 @@
-import { isAuthenticated, login, logout } from './src/auth.js?v=20260304d';
-import { LandingPage } from './src/pages/LandingPage.js?v=20260304d';
-import { LoginPage } from './src/pages/LoginPage.js?v=20260304d';
-import { SignupPage } from './src/pages/SignupPage.js?v=20260304d';
-import { DashboardPage } from './src/pages/DashboardPage.js?v=20260304d';
-import { AnalyzerPage } from './src/pages/AnalyzerPage.js?v=20260304d';
-import { bindNavbar } from './src/components/Navbar.js?v=20260304d';
-import { bindResumeAnalyzer } from './src/components/ResumeAnalyzer.js?v=20260304d';
+const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:4000/api' : '/api';
 
-window.__AIP_UI_VERSION = 'saas-v3-20260304d';
-document.title = 'AIP SaaS v3';
+const el = (id) => document.getElementById(id);
 
-const ensureVersionBadge = () => {
-  let badge = document.getElementById('aip-version-badge');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.id = 'aip-version-badge';
-    badge.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:9999;padding:6px 10px;border-radius:999px;font:600 11px/1.2 Inter,system-ui;background:#0b1326;color:#93c5fd;border:1px solid #334155;opacity:.9';
-    document.body.appendChild(badge);
-  }
+let resumeText = '';
+let analysis = null;
+let optimizedResume = '';
+let currentAuthMode = 'login';
 
-  badge.textContent = `UI ${window.__AIP_UI_VERSION}`;
+const setError = (message = '') => {
+  el('error').innerHTML = message ? `<div class="error">${message}</div>` : '';
 };
 
-let app;
-const protectedPaths = ['/dashboard', '/analyzer'];
-
-const ensureAppRoot = () => {
-  app = document.getElementById('app');
-  if (!app) {
-    document.body.innerHTML = '<div id="app"></div>';
-    app = document.getElementById('app');
-  }
+const setLoading = (message = '') => {
+  el('loading').textContent = message;
 };
 
-const navigate = (path) => {
-  window.history.pushState({}, '', path);
-  render();
+const renderAuthModal = (mode) => {
+  currentAuthMode = mode;
+  const config = {
+    login: {
+      title: 'Log in to AIP',
+      subtitle: 'Access your saved analyses and optimized resume history.',
+      cta: 'Log in'
+    },
+    signup: {
+      title: 'Create your AIP account',
+      subtitle: 'Start free and optimize your first resume in minutes.',
+      cta: 'Create account'
+    },
+    enterprise: {
+      title: 'Enterprise SSO Access',
+      subtitle: 'Sign in with your company domain and continue to SSO.',
+      cta: 'Continue to SSO'
+    }
+  }[mode];
+
+  el('modalTitle').textContent = config.title;
+  el('modalSubtitle').textContent = config.subtitle;
+  el('authSubmit').textContent = config.cta;
+  el('authNotice').textContent = '';
+  el('authEmail').value = '';
+  el('authOrg').value = '';
+  el('authPassword').value = '';
+  el('authModal').style.display = 'flex';
 };
 
-const render = () => {
-  ensureAppRoot();
-  ensureVersionBadge();
-  const path = window.location.pathname;
+const closeAuthModal = () => {
+  el('authModal').style.display = 'none';
+};
 
-  if (protectedPaths.includes(path) && !isAuthenticated()) {
-    navigate('/login');
+for (const button of document.querySelectorAll('[data-open]')) {
+  button.addEventListener('click', () => renderAuthModal(button.dataset.open));
+}
+
+el('authCancel').addEventListener('click', closeAuthModal);
+el('authModal').addEventListener('click', (event) => {
+  if (event.target.id === 'authModal') closeAuthModal();
+});
+
+el('authSubmit').addEventListener('click', () => {
+  const email = el('authEmail').value.trim();
+  const org = el('authOrg').value.trim();
+  const password = el('authPassword').value.trim();
+
+  if (!email || !password) {
+    el('authNotice').textContent = 'Please provide your email and password/token.';
     return;
   }
 
-  if (path === '/') app.innerHTML = LandingPage();
-  else if (path === '/login') app.innerHTML = LoginPage();
-  else if (path === '/signup') app.innerHTML = SignupPage();
-  else if (path === '/dashboard') app.innerHTML = DashboardPage();
-  else if (path === '/analyzer') app.innerHTML = AnalyzerPage();
-  else app.innerHTML = LandingPage();
+  const modeLabel = currentAuthMode === 'enterprise' ? 'Enterprise SSO request' : 'Authentication';
+  el('authNotice').textContent = `${modeLabel} accepted for ${email}${org ? ` at ${org}` : ''}. (Demo mode)`;
+  setTimeout(closeAuthModal, 900);
+});
 
-  bindGlobalEvents();
-};
+el('resumeFile').addEventListener('change', async (event) => {
+  setError('');
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (file.type !== 'application/pdf') {
+    setError('Invalid file type. Please upload a PDF.');
+    return;
+  }
 
-const bindGlobalEvents = () => {
-  document.querySelectorAll('[data-link]').forEach((a) => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      navigate(a.getAttribute('href'));
+  el('resumeStatus').textContent = 'Uploading and extracting resume text...';
+  const formData = new FormData();
+  formData.append('resume', file);
+
+  try {
+    const resp = await fetch(`${apiBase}/resume/upload`, { method: 'POST', body: formData });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Upload failed');
+
+    resumeText = data.resumeText;
+    el('resumeStatus').textContent = 'Resume successfully parsed and ready for analysis.';
+    el('resumeStatus').className = 'ok';
+  } catch (err) {
+    el('resumeStatus').textContent = '';
+    setError(err.message || 'Upload failed');
+  }
+});
+
+el('analyzeBtn').addEventListener('click', async () => {
+  setError('');
+  optimizedResume = '';
+  const jobDescription = el('jobDescription').value.trim();
+
+  if (!resumeText) return setError('Please upload a resume before analyzing.');
+  if (!jobDescription) return setError('Please paste a job description.');
+
+  setLoading('Analyzing resume...');
+
+  try {
+    const resp = await fetch(`${apiBase}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText, jobDescription })
     });
-  });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Analyze failed');
 
-  bindNavbar(navigate);
+    analysis = data;
+    el('score').textContent = `${analysis.score}%`;
+    el('matched').innerHTML = analysis.matchedKeywords.map((k) => `<span class="chip">${k}</span>`).join('') || 'None';
+    el('missing').innerHTML = analysis.missingKeywords.map((k) => `<span class="chip">${k}</span>`).join('') || 'None';
+    el('results').style.display = 'block';
+    el('optimizedWrap').style.display = 'none';
+  } catch (err) {
+    setError(err.message || 'Analyze failed');
+  } finally {
+    setLoading('');
+  }
+});
 
-  document.getElementById('sidebarLogout')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    logout();
-    navigate('/login');
-  });
+el('optimizeBtn').addEventListener('click', async () => {
+  setError('');
+  const jobDescription = el('jobDescription').value.trim();
 
-  document.getElementById('loginBtn')?.addEventListener('click', () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if (!email || !password) return;
-    login();
-    navigate('/dashboard');
-  });
+  if (!resumeText || !analysis) return setError('Run analysis first.');
 
-  document.getElementById('signupBtn')?.addEventListener('click', () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if (!email || !password) return;
-    login();
-    navigate('/dashboard');
-  });
+  setLoading('Generating optimized resume...');
 
-  if (window.location.pathname === '/analyzer') bindResumeAnalyzer();
-};
+  try {
+    const resp = await fetch(`${apiBase}/rewrite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText, jobDescription })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Optimize failed');
 
-window.addEventListener('popstate', render);
-console.info('[AIP] Loaded UI build', window.__AIP_UI_VERSION);
-render();
+    optimizedResume = data.optimizedResume;
+    el('optimizedText').textContent = optimizedResume;
+    el('optimizedWrap').style.display = 'block';
+  } catch (err) {
+    setError(err.message || 'Optimize failed');
+  } finally {
+    setLoading('');
+  }
+});
+
+el('downloadBtn').addEventListener('click', () => {
+  if (!optimizedResume) {
+    setError('Nothing to download yet. Optimize the resume first.');
+    return;
+  }
+
+  const blob = new Blob([optimizedResume], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'optimized-resume.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+});

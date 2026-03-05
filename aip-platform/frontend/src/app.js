@@ -1,100 +1,97 @@
-import { isAuthenticated, login, logout } from './spa/auth.js?v=20260304d';
-import { LandingPage } from './spa/pages/LandingPage.js?v=20260304d';
-import { LoginPage } from './spa/pages/LoginPage.js?v=20260304d';
-import { SignupPage } from './spa/pages/SignupPage.js?v=20260304d';
-import { DashboardPage } from './spa/pages/DashboardPage.js?v=20260304d';
-import { AnalyzerPage } from './spa/pages/AnalyzerPage.js?v=20260304d';
-import { bindNavbar } from './spa/components/Navbar.js?v=20260304d';
-import { bindResumeAnalyzer } from './spa/components/ResumeAnalyzer.js?v=20260304d';
+const apiBase = 'http://localhost:4000/api';
 
-window.__AIP_UI_VERSION = 'saas-v3-20260304d';
-document.title = 'AIP SaaS v3';
+const el = (id) => document.getElementById(id);
 
+let resumeText = '';
+let analysis = null;
 
-const ensureVersionBadge = () => {
-  let badge = document.getElementById('aip-version-badge');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.id = 'aip-version-badge';
-    badge.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:9999;padding:6px 10px;border-radius:999px;font:600 11px/1.2 Inter,system-ui;background:#0b1326;color:#93c5fd;border:1px solid #334155;opacity:.9';
-    document.body.appendChild(badge);
-  }
-
-  badge.textContent = `UI ${window.__AIP_UI_VERSION}`;
+const setError = (message = '') => {
+  el('error').innerHTML = message ? `<div class="err">${message}</div>` : '';
 };
 
-
-let app;
-const protectedPaths = ['/dashboard', '/analyzer'];
-
-const ensureAppRoot = () => {
-  app = document.getElementById('app');
-  if (!app) {
-    document.body.innerHTML = '<div id="app"></div>';
-    app = document.getElementById('app');
-  }
-};
-
-const navigate = (path) => {
-  window.history.pushState({}, '', path);
-  render();
-};
-
-const render = () => {
-  ensureAppRoot();
-  ensureVersionBadge();
-  const path = window.location.pathname;
-
-  if (protectedPaths.includes(path) && !isAuthenticated()) {
-    navigate('/login');
+el('resumeFile').addEventListener('change', async (event) => {
+  setError('');
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (file.type !== 'application/pdf') {
+    setError('Invalid file type. Please upload a PDF.');
     return;
   }
 
-  if (path === '/') app.innerHTML = LandingPage();
-  else if (path === '/login') app.innerHTML = LoginPage();
-  else if (path === '/signup') app.innerHTML = SignupPage();
-  else if (path === '/dashboard') app.innerHTML = DashboardPage();
-  else if (path === '/analyzer') app.innerHTML = AnalyzerPage();
-  else app.innerHTML = LandingPage();
+  el('resumeStatus').textContent = 'Uploading and extracting resume text...';
+  const formData = new FormData();
+  formData.append('resume', file);
 
-  bindGlobalEvents();
-};
+  try {
+    const resp = await fetch(`${apiBase}/resume/upload`, { method: 'POST', body: formData });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Upload failed');
+    resumeText = data.resumeText;
+    el('resumeStatus').textContent = 'Resume successfully parsed.';
+  } catch (err) {
+    el('resumeStatus').textContent = '';
+    setError(err.message || 'Upload failed');
+  }
+});
 
-const bindGlobalEvents = () => {
-  document.querySelectorAll('[data-link]').forEach((a) => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      navigate(a.getAttribute('href'));
+el('analyzeBtn').addEventListener('click', async () => {
+  setError('');
+  const jobDescription = el('jobDescription').value.trim();
+  if (!resumeText) return setError('Please upload a resume before analyzing.');
+  if (!jobDescription) return setError('Please paste a job description.');
+
+  el('loading').textContent = 'Analyzing...';
+  try {
+    const resp = await fetch(`${apiBase}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText, jobDescription })
     });
-  });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Analyze failed');
+    analysis = data;
 
-  bindNavbar(navigate);
+    el('score').textContent = `${data.score}%`;
+    el('matched').innerHTML = data.matchedKeywords.map((k) => `<span class="chip">${k}</span>`).join('') || 'None';
+    el('missing').innerHTML = data.missingKeywords.map((k) => `<span class="chip">${k}</span>`).join('') || 'None';
+    el('results').style.display = 'block';
+  } catch (err) {
+    setError(err.message || 'Analyze failed');
+  } finally {
+    el('loading').textContent = '';
+  }
+});
 
-  document.getElementById('sidebarLogout')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    logout();
-    navigate('/login');
-  });
+el('optimizeBtn').addEventListener('click', async () => {
+  setError('');
+  const jobDescription = el('jobDescription').value.trim();
+  if (!resumeText || !analysis) return setError('Run analysis first.');
 
-  document.getElementById('loginBtn')?.addEventListener('click', () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if (!email || !password) return;
-    login();
-    navigate('/dashboard');
-  });
+  el('loading').textContent = 'Optimizing...';
+  try {
+    const resp = await fetch(`${apiBase}/rewrite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText, jobDescription })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Optimize failed');
+    el('optimizedText').textContent = data.optimizedResume;
+    el('optimizedWrap').style.display = 'block';
+  } catch (err) {
+    setError(err.message || 'Optimize failed');
+  } finally {
+    el('loading').textContent = '';
+  }
+});
 
-  document.getElementById('signupBtn')?.addEventListener('click', () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if (!email || !password) return;
-    login();
-    navigate('/dashboard');
-  });
-
-  if (window.location.pathname === '/analyzer') bindResumeAnalyzer();
-};
-
-window.addEventListener('popstate', render);
-console.info('[AIP] Loaded UI build', window.__AIP_UI_VERSION);
-render();
+el('downloadBtn').addEventListener('click', () => {
+  const text = el('optimizedText').textContent || '';
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'optimized-resume.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+});
