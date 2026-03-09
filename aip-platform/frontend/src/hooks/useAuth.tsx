@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 
 interface AuthContextType {
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSession] = useState<Session | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Get initial session
@@ -30,17 +32,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         // Listen for auth changes (login, logout, token refresh)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             setSession(session);
             setUser(session?.user ?? null);
             setLoading(false);
+
+            // After OAuth callback, Supabase fires SIGNED_IN. Navigate to analyzer.
+            if (event === 'SIGNED_IN' && session) {
+                navigate('/analyzer');
+            }
         });
 
         return () => subscription.unsubscribe();
-    }, []);
+    }, [navigate]);
 
     const signOut = async () => {
         await supabase.auth.signOut();
+        navigate('/');
     };
 
     return (
