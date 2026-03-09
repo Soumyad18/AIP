@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const CheckCircle = () => (
@@ -15,6 +16,14 @@ const ArrowRight = () => (
 
 export const LandingPage = () => {
   const { session, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  // Auto-redirect logged-in users to the dashboard
+  useEffect(() => {
+    if (session) {
+      navigate('/analyzer', { replace: true });
+    }
+  }, [session, navigate]);
 
   return (
     <div className="landing">
