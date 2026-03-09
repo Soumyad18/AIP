@@ -12,13 +12,18 @@ export const AuthCallbackPage = () => {
 
     useEffect(() => {
         // Log the hash to make sure Vercel didn't strip it
-        console.log("Auth callback mounted. Hash:", window.location.hash);
+        console.log("Auth callback mounted.");
+        console.log("Origin:", window.location.origin);
+        console.log("Href:", window.location.href);
+        console.log("Hash:", window.location.hash);
+
         if (!window.location.hash || !window.location.hash.includes('access_token')) {
-            setAuthError("No access token found in URL. Are you sure you came from a login redirect?");
+            setAuthError("No access token found in URL. Are you sure you came from a login redirect? Current URL: " + window.location.href);
         }
 
         // Check immediately in case the session is already processed
         supabase.auth.getSession().then(({ data: { session }, error }) => {
+            console.log("Initial getSession result:", { session, error });
             if (error) {
                 console.error("Auth getSession error:", error);
                 setAuthError(`getSession error: ${error.message}`);
@@ -29,7 +34,7 @@ export const AuthCallbackPage = () => {
 
         // Listen for any auth state change that results in a session
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            console.log("Auth state changed in callback:", event, !!session);
+            console.log("Auth state changed in callback. Event:", event, "Session exists:", !!session);
             if (event === 'PASSWORD_RECOVERY') {
                 setAuthError("Password recovery unsupported here");
             } else if (session) {
