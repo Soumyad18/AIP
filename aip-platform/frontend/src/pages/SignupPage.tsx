@@ -35,9 +35,19 @@ export const SignupPage = () => {
         setLoading(true);
         setError(null);
 
+        const getURL = () => {
+            let url =
+                window?.location?.origin ??
+                import.meta.env.VITE_SITE_URL ??
+                'https://aip-fawn.vercel.app/';
+            url = url.includes('http') ? url : `https://${url}`;
+            url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
+            return `${url}auth/callback`;
+        };
+
         const { error } = await supabase.auth.signInWithOAuth({
             provider,
-            options: { redirectTo: `${window.location.origin}/auth/callback` }
+            options: { redirectTo: getURL() }
         });
 
         if (error) {

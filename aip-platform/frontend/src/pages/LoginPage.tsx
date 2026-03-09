@@ -28,9 +28,21 @@ export const LoginPage = () => {
         setLoading(true);
         setError(null);
 
+        const getURL = () => {
+            let url =
+                window?.location?.origin ?? // Use current window origin
+                import.meta.env.VITE_SITE_URL ?? // Or VITE_SITE_URL
+                'https://aip-fawn.vercel.app/'; // Fallback to production URL
+            // Make sure to include `https://` when not localhost.
+            url = url.includes('http') ? url : `https://${url}`;
+            // Make sure to append the suffix.
+            url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
+            return `${url}auth/callback`;
+        };
+
         const { error } = await supabase.auth.signInWithOAuth({
             provider,
-            options: { redirectTo: `${window.location.origin}/auth/callback` }
+            options: { redirectTo: getURL() }
         });
 
         if (error) {
