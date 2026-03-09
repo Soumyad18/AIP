@@ -11,23 +11,17 @@ export const AuthCallbackPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Supabase will automatically process the URL hash and store the session.
-        supabase.auth.getSession().then(({ data: { session }, error }) => {
-            if (error) {
-                console.error("Auth error:", error);
-                navigate('/login?error=auth', { replace: true });
-            } else if (session) {
+        // Check immediately in case the session is already processed
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
                 navigate('/analyzer', { replace: true });
             }
         });
 
-        // Also listen for changes just in case getSession is too fast
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' && session) {
+        // Listen for any auth state change that results in a session
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session) {
                 navigate('/analyzer', { replace: true });
-            }
-            if (event === 'SIGNED_OUT') {
-                navigate('/login', { replace: true });
             }
         });
 
