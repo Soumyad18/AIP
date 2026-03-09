@@ -1,0 +1,7 @@
+{
+    "name": "aip-root",
+    "private": true,
+    "scripts": {
+        "build": "npm install --prefix aip-platform/frontend && npm run build --prefix aip-platform/frontend && rm -rf public && cp -r aip-platform/frontend/dist public"
+    }
+}
