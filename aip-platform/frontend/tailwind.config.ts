@@ -9,6 +9,9 @@ export default {
           600: '#2563eb',
           700: '#1d4ed8'
         }
+      },
+      fontFamily: {
+        heading: ['Unbounded', 'sans-serif'],
       }
     }
   },
