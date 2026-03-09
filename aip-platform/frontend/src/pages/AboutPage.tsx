@@ -73,6 +73,17 @@ export const AboutPage = () => {
                 ))}
             </div>
 
+            {/* ── The Vision Behind AIP ── */}
+            <div className="card pad mb-6 p-6 md:p-8" style={{ borderLeft: '4px solid var(--secondary-2)' }}>
+                <h3 className="text-xl font-bold font-heading text-[var(--heading)] mb-4">The Vision Behind AIP</h3>
+                <p className="text-[var(--body)] leading-relaxed mb-4">
+                    The idea for the ATS Intelligence Platform (AIP) was born out of a stark realization: the modern recruitment process is fundamentally broken for both sides. Candidates send thousands of resumes into the "black box" of Applicant Tracking Systems without ever knowing why they were rejected, while recruiters are overwhelmed by misaligned applications.
+                </p>
+                <p className="text-[var(--body)] leading-relaxed">
+                    As a backend engineer, I saw this as a systemic data-matching problem. AIP is my systematic solution. It's designed to democratize ATS algorithms, giving job seekers the exact mathematical insights and AI-driven optimizations they need to bridge the gap between their raw talent and the rigid keyword parsers guarding their dream jobs.
+                </p>
+            </div>
+
             {/* ── Core Competencies ── */}
             <div className="card pad mb-6 p-6 md:p-8">
                 <h3 className="text-xl font-bold font-heading text-[var(--heading)] mb-6">Core Backend Competencies & Skills</h3>
