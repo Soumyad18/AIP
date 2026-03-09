@@ -10,6 +10,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { ResumeTemplatesPage } from './pages/ResumeTemplatesPage';
 import { SkillsPage } from './pages/SkillsPage';
 import { UploadResumePage } from './pages/UploadResumePage';
+import { SubscriptionPage } from './pages/SubscriptionPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardLayout } from './components/DashboardLayout';
 
@@ -31,6 +32,7 @@ export const App = () => (
         <Route path="/templates" element={<ResumeTemplatesPage />} />
         <Route path="/skills" element={<SkillsPage />} />
         <Route path="/upload" element={<UploadResumePage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
       </Route>
     </Route>
 

@@ -55,6 +55,12 @@ const AnalyzerIcon = () => (
     </svg>
 );
 
+const SubscriptionIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+);
+
 const LogoutIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -78,6 +84,21 @@ const CloseIcon = () => (
     </svg>
 );
 
+// Collapse / Expand chevrons
+const CollapseIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="11 17 6 12 11 7" />
+        <polyline points="18 17 13 12 18 7" />
+    </svg>
+);
+
+const ExpandIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="13 17 18 12 13 7" />
+        <polyline points="6 17 11 12 6 7" />
+    </svg>
+);
+
 const navItems: NavItem[] = [
     { to: '/analyzer', label: 'Analyzer', icon: <AnalyzerIcon /> },
     { to: '/profile', label: 'Profile', icon: <ProfileIcon /> },
@@ -85,6 +106,7 @@ const navItems: NavItem[] = [
     { to: '/skills', label: 'Skills', icon: <SkillsIcon /> },
     { to: '/upload', label: 'Upload Resume', icon: <UploadIcon /> },
     { to: '/templates', label: 'Templates', icon: <TemplatesIcon /> },
+    { to: '/subscription', label: 'Subscription', icon: <SubscriptionIcon /> },
 ];
 
 function getInitials(name?: string | null, email?: string | null): string {
@@ -94,45 +116,71 @@ function getInitials(name?: string | null, email?: string | null): string {
     return email ? email[0].toUpperCase() : '?';
 }
 
+const SIDEBAR_EXPANDED = 240;
+const SIDEBAR_COLLAPSED = 68;
+
 export const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, signOut } = useAuth();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [collapsed, setCollapsed] = useState(false);
 
     const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || null;
     const email = user?.email || '';
     const initials = getInitials(displayName, email);
+    const sidebarWidth = collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
 
     const handleSignOut = async () => {
         await signOut();
         navigate('/');
     };
 
-    const SidebarContent = () => (
+    const SidebarContent = ({ isCollapsed = false }: { isCollapsed?: boolean }) => (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {/* Logo */}
-            <div style={{ padding: '28px 24px 20px', borderBottom: '1px solid #e8f5f1' }}>
+            {/* Logo + Collapse Toggle */}
+            <div style={{ padding: isCollapsed ? '28px 12px 20px' : '28px 24px 20px', borderBottom: '1px solid #e8f5f1', display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between' }}>
                 <Link to="/analyzer" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                    <div style={{
-                        width: 34, height: 34, borderRadius: 10,
-                        background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                            <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                        </svg>
-                    </div>
-                    <span style={{ fontFamily: "'Unbounded', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--heading)' }}>
-                        AIP
-                    </span>
+                    <img src="/aip-logo.svg" alt="AIP" style={{ width: 38, height: 38, flexShrink: 0 }} />
+                    {!isCollapsed && (
+                        <span style={{ fontFamily: "'Unbounded', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--heading)' }}>
+                            Dashboard
+                        </span>
+                    )}
                 </Link>
+                {!isCollapsed && (
+                    <button
+                        onClick={() => setCollapsed(true)}
+                        className="sidebar-toggle-btn"
+                        title="Collapse sidebar"
+                        aria-label="Collapse sidebar"
+                    >
+                        <CollapseIcon />
+                    </button>
+                )}
             </div>
 
+            {/* Expand button when collapsed */}
+            {isCollapsed && (
+                <div style={{ padding: '12px 0', display: 'flex', justifyContent: 'center' }}>
+                    <button
+                        onClick={() => setCollapsed(false)}
+                        className="sidebar-toggle-btn"
+                        title="Expand sidebar"
+                        aria-label="Expand sidebar"
+                    >
+                        <ExpandIcon />
+                    </button>
+                </div>
+            )}
+
             {/* Nav */}
-            <nav style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
-                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#9ab5ad', textTransform: 'uppercase', padding: '0 12px', marginBottom: 8 }}>
-                    Navigation
-                </p>
+            <nav style={{ flex: 1, padding: isCollapsed ? '8px 8px' : '16px 12px', overflowY: 'auto' }}>
+                {!isCollapsed && (
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#9ab5ad', textTransform: 'uppercase', padding: '0 12px', marginBottom: 8 }}>
+                        Navigation
+                    </p>
+                )}
                 {navItems.map(item => {
                     const active = location.pathname === item.to;
                     return (
@@ -140,59 +188,87 @@ export const DashboardLayout = ({ children }: { children?: React.ReactNode }) =>
                             key={item.to}
                             to={item.to}
                             onClick={() => setMobileOpen(false)}
+                            title={isCollapsed ? item.label : undefined}
                             style={{
                                 display: 'flex', alignItems: 'center', gap: 10,
-                                padding: '10px 12px', borderRadius: 10, marginBottom: 2,
+                                padding: isCollapsed ? '10px 0' : '10px 12px',
+                                justifyContent: isCollapsed ? 'center' : 'flex-start',
+                                borderRadius: 10, marginBottom: 2,
                                 fontFamily: "'Open Sans', sans-serif", fontSize: 14, fontWeight: active ? 700 : 500,
                                 color: active ? 'var(--primary)' : 'var(--body)',
                                 background: active ? 'var(--secondary-1)' : 'transparent',
                                 textDecoration: 'none',
                                 transition: 'all 0.15s ease',
+                                position: 'relative',
                             }}
                             onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = '#f0faf7'; }}
                             onMouseLeave={e => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                         >
                             <span style={{ color: active ? 'var(--primary)' : '#7a9e97', flexShrink: 0 }}>{item.icon}</span>
-                            {item.label}
+                            {!isCollapsed && item.label}
                         </Link>
                     );
                 })}
             </nav>
 
             {/* User + Logout */}
-            <div style={{ padding: '16px 12px', borderTop: '1px solid #e8f5f1' }}>
-                <Link to="/profile" onClick={() => setMobileOpen(false)} style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 12px', borderRadius: 10, textDecoration: 'none',
-                    background: '#f8fdfc', marginBottom: 8,
-                    transition: 'background 0.15s ease',
-                }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'var(--secondary-1)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = '#f8fdfc')}
-                >
-                    <div style={{
-                        width: 34, height: 34, borderRadius: '50%',
-                        background: 'var(--primary)', color: '#fff',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontFamily: "'Unbounded', sans-serif", fontSize: 12, fontWeight: 700, flexShrink: 0,
+            <div style={{ padding: isCollapsed ? '12px 8px' : '16px 12px', borderTop: '1px solid #e8f5f1' }}>
+                {isCollapsed ? (
+                    /* Collapsed: just show avatar */
+                    <Link to="/profile" onClick={() => setMobileOpen(false)} title={displayName || email} style={{
+                        display: 'flex', justifyContent: 'center', marginBottom: 8,
+                        textDecoration: 'none',
                     }}>
-                        {initials}
-                    </div>
-                    <div style={{ overflow: 'hidden' }}>
-                        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--heading)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {displayName || 'My Profile'}
-                        </p>
-                        <p style={{ margin: 0, fontSize: 11, color: '#7a9e97', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {email}
-                        </p>
-                    </div>
-                </Link>
+                        <div style={{
+                            width: 36, height: 36, borderRadius: '50%',
+                            background: 'var(--primary)', color: '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontFamily: "'Unbounded', sans-serif", fontSize: 12, fontWeight: 700,
+                        }}>
+                            {initials}
+                        </div>
+                    </Link>
+                ) : (
+                    /* Expanded: show full user card */
+                    <Link to="/profile" onClick={() => setMobileOpen(false)} style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 12px', borderRadius: 10, textDecoration: 'none',
+                        background: '#f8fdfc', marginBottom: 8,
+                        transition: 'background 0.15s ease',
+                    }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--secondary-1)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = '#f8fdfc')}
+                    >
+                        <div style={{
+                            width: 34, height: 34, borderRadius: '50%',
+                            background: 'var(--primary)', color: '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontFamily: "'Unbounded', sans-serif", fontSize: 12, fontWeight: 700, flexShrink: 0,
+                        }}>
+                            {initials}
+                        </div>
+                        <div style={{ overflow: 'hidden' }}>
+                            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--heading)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {displayName || 'My Profile'}
+                            </p>
+                            <p style={{ margin: 0, fontSize: 11, color: '#7a9e97', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {email}
+                            </p>
+                        </div>
+                    </Link>
+                )}
                 <button
                     onClick={handleSignOut}
                     className="btn btn-secondary"
-                    style={{ width: '100%', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+                    title="Log Out"
+                    style={{
+                        width: '100%', fontSize: 13,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        padding: isCollapsed ? '10px 0' : undefined,
+                    }}
                 >
-                    <LogoutIcon /> Log Out
+                    <LogoutIcon />
+                    {!isCollapsed && 'Log Out'}
                 </button>
             </div>
         </div>
@@ -201,16 +277,24 @@ export const DashboardLayout = ({ children }: { children?: React.ReactNode }) =>
     return (
         <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)' }}>
             {/* Desktop Sidebar */}
-            <aside style={{
-                width: 240, flexShrink: 0,
-                background: '#fff', borderRight: '1px solid #e0f0eb',
-                position: 'sticky', top: 0, height: '100vh',
-                boxShadow: '2px 0 16px rgba(38,166,136,0.06)',
-                display: 'flex', flexDirection: 'column',
-            }}
+            <aside
                 className="hidden-mobile-sidebar"
+                style={{
+                    width: sidebarWidth,
+                    flexShrink: 0,
+                    background: '#fff',
+                    borderRight: '1px solid #e0f0eb',
+                    position: 'sticky',
+                    top: 0,
+                    height: '100vh',
+                    boxShadow: '2px 0 16px rgba(38,166,136,0.06)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                    overflow: 'hidden',
+                }}
             >
-                <SidebarContent />
+                <SidebarContent isCollapsed={collapsed} />
             </aside>
 
             {/* Mobile Header */}
@@ -224,12 +308,8 @@ export const DashboardLayout = ({ children }: { children?: React.ReactNode }) =>
                 className="mobile-header"
             >
                 <Link to="/analyzer" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
-                            <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                        </svg>
-                    </div>
-                    <span style={{ fontFamily: "'Unbounded', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--heading)' }}>AIP</span>
+                    <img src="/aip-logo.svg" alt="AIP" style={{ width: 30, height: 30 }} />
+                    <span style={{ fontFamily: "'Unbounded', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--heading)' }}>Dashboard</span>
                 </Link>
                 <button onClick={() => setMobileOpen(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--heading)', padding: 4 }}>
                     {mobileOpen ? <CloseIcon /> : <MenuIcon />}
@@ -238,28 +318,43 @@ export const DashboardLayout = ({ children }: { children?: React.ReactNode }) =>
 
             {/* Mobile Drawer */}
             {mobileOpen && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 40,
-                }}>
+                <div style={{ position: 'fixed', inset: 0, zIndex: 40 }}>
                     <div onClick={() => setMobileOpen(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.3)' }} />
                     <aside style={{
                         position: 'absolute', top: 0, left: 0, bottom: 0, width: 260,
                         background: '#fff', display: 'flex', flexDirection: 'column',
                         boxShadow: '4px 0 24px rgba(0,0,0,0.12)',
                     }}>
-                        <SidebarContent />
+                        <SidebarContent isCollapsed={false} />
                     </aside>
                 </div>
             )}
 
             {/* Main Content */}
-            <main style={{ flex: 1, minWidth: 0 }}
-                className="dashboard-main"
-            >
+            <main style={{ flex: 1, minWidth: 0 }} className="dashboard-main">
                 {children ? children : <Outlet />}
             </main>
 
             <style>{`
+        .sidebar-toggle-btn {
+          width: 28px;
+          height: 28px;
+          border-radius: 8px;
+          border: 1px solid #e0f0eb;
+          background: #f8fdfc;
+          color: #7a9e97;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+        .sidebar-toggle-btn:hover {
+          background: var(--secondary-1);
+          color: var(--primary);
+          border-color: var(--primary);
+        }
         @media (min-width: 769px) {
           .hidden-mobile-sidebar { display: flex !important; flex-direction: column; }
           .mobile-header { display: none !important; }
