@@ -22,14 +22,16 @@ export const App = () => (
     <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
     {/* Protected Dashboard routes */}
-    <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-      <Route path="/analyzer" element={<ResumeAnalyzerPage />} />
-      <Route path="/results" element={<ResultsPage />} />
-      <Route path="/records" element={<MyRecordsPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/templates" element={<ResumeTemplatesPage />} />
-      <Route path="/skills" element={<SkillsPage />} />
-      <Route path="/upload" element={<UploadResumePage />} />
+    <Route element={<ProtectedRoute />}>
+      <Route element={<DashboardLayout />}>
+        <Route path="/analyzer" element={<ResumeAnalyzerPage />} />
+        <Route path="/results" element={<ResultsPage />} />
+        <Route path="/records" element={<MyRecordsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/templates" element={<ResumeTemplatesPage />} />
+        <Route path="/skills" element={<SkillsPage />} />
+        <Route path="/upload" element={<UploadResumePage />} />
+      </Route>
     </Route>
 
     {/* Fallback */}

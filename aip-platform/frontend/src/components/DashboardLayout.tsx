@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
 interface NavItem {
@@ -94,7 +94,7 @@ function getInitials(name?: string | null, email?: string | null): string {
     return email ? email[0].toUpperCase() : '?';
 }
 
-export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+export const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user, signOut } = useAuth();
@@ -256,7 +256,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
             <main style={{ flex: 1, minWidth: 0 }}
                 className="dashboard-main"
             >
-                {children}
+                {children ? children : <Outlet />}
             </main>
 
             <style>{`
