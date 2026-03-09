@@ -14,6 +14,15 @@ export const LoginPage = () => {
         setLoading(true);
         setError(null);
 
+        // --- Mock Enterprise Auth Intercept ---
+        if (email === 'enterprise@aip.mock' && password === '0000') {
+            localStorage.setItem('mock_enterprise', 'true');
+            // Force a hard reload so the AuthProvider mounts with the local storage flag 
+            // and bypasses Supabase entirely.
+            window.location.href = '/analyzer';
+            return;
+        }
+
         const { error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
@@ -90,7 +99,7 @@ export const LoginPage = () => {
                     <input
                         type="email"
                         className="input"
-                        placeholder="Personal or Work email"
+                        placeholder="Personal or Work email (or enterprise@aip.mock)"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required

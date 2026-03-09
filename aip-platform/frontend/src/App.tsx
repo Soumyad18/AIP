@@ -11,8 +11,16 @@ import { ResumeTemplatesPage } from './pages/ResumeTemplatesPage';
 import { SkillsPage } from './pages/SkillsPage';
 import { UploadResumePage } from './pages/UploadResumePage';
 import { SubscriptionPage } from './pages/SubscriptionPage';
+import { AboutPage } from './pages/AboutPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardLayout } from './components/DashboardLayout';
+
+import { TeamDashboardPage } from './pages/TeamDashboardPage';
+import { TeamMembersPage } from './pages/TeamMembersPage';
+import { TeamCandidatesPage } from './pages/TeamCandidatesPage';
+import { TeamAnalyticsPage } from './pages/TeamAnalyticsPage';
+import { TeamResumeBankPage } from './pages/TeamResumeBankPage';
+import { TeamSettingsPage } from './pages/TeamSettingsPage';
 
 export const App = () => (
   <Routes>
@@ -25,6 +33,7 @@ export const App = () => (
     {/* Protected Dashboard routes */}
     <Route element={<ProtectedRoute />}>
       <Route element={<DashboardLayout />}>
+        {/* Core Individual Features */}
         <Route path="/analyzer" element={<ResumeAnalyzerPage />} />
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/records" element={<MyRecordsPage />} />
@@ -33,6 +42,15 @@ export const App = () => (
         <Route path="/skills" element={<SkillsPage />} />
         <Route path="/upload" element={<UploadResumePage />} />
         <Route path="/subscription" element={<SubscriptionPage />} />
+        <Route path="/about" element={<AboutPage />} />
+
+        {/* Enterprise Team Features */}
+        <Route path="/team" element={<TeamDashboardPage />} />
+        <Route path="/team/members" element={<TeamMembersPage />} />
+        <Route path="/team/candidates" element={<TeamCandidatesPage />} />
+        <Route path="/team/analytics" element={<TeamAnalyticsPage />} />
+        <Route path="/team/resumes" element={<TeamResumeBankPage />} />
+        <Route path="/team/settings" element={<TeamSettingsPage />} />
       </Route>
     </Route>
 
