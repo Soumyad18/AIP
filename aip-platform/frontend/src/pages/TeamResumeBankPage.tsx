@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+
 export const TeamResumeBankPage = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="page-container">
             <div className="page-header">
@@ -6,7 +10,10 @@ export const TeamResumeBankPage = () => {
                     <h1>Shared Resume Bank</h1>
                     <p className="subtitle">Repository of successful, highly-optimized resumes</p>
                 </div>
-                <button className="btn btn-primary">
+                <button
+                    className="btn btn-primary"
+                    onClick={() => navigate('/team/template-builder')}
+                >
                     + Upload to Bank
                 </button>
             </div>

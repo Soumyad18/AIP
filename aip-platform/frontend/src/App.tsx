@@ -21,6 +21,7 @@ import { TeamCandidatesPage } from './pages/TeamCandidatesPage';
 import { TeamAnalyticsPage } from './pages/TeamAnalyticsPage';
 import { TeamResumeBankPage } from './pages/TeamResumeBankPage';
 import { TeamSettingsPage } from './pages/TeamSettingsPage';
+import { TemplateBuilderPage } from './pages/TemplateBuilderPage';
 
 export const App = () => (
   <Routes>
@@ -51,6 +52,7 @@ export const App = () => (
         <Route path="/team/analytics" element={<TeamAnalyticsPage />} />
         <Route path="/team/resumes" element={<TeamResumeBankPage />} />
         <Route path="/team/settings" element={<TeamSettingsPage />} />
+        <Route path="/team/template-builder" element={<TemplateBuilderPage />} />
       </Route>
     </Route>
 
