@@ -12,6 +12,7 @@ export const TemplateBuilderPage = () => {
     // Formatting State
     const [fontFamily, setFontFamily] = useState('Inter, sans-serif');
     const [accentColor, setAccentColor] = useState('#1a2744');
+    const [includeImage, setIncludeImage] = useState(false);
 
     // Content State
     const [content, setContent] = useState(
@@ -109,6 +110,20 @@ export const TemplateBuilderPage = () => {
                                 </div>
                             </div>
                         </div>
+
+                        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-[#f1f5f9]">
+                            <input
+                                type="checkbox"
+                                id="includeImage"
+                                checked={includeImage}
+                                onChange={e => setIncludeImage(e.target.checked)}
+                                className="w-4 h-4 rounded border-[#cbd5e1] text-[var(--primary)] focus:ring-[var(--primary)] cursor-pointer"
+                            />
+                            <label htmlFor="includeImage" className="text-sm font-semibold text-[var(--heading)] cursor-pointer">
+                                Support Profile Picture / Logo
+                            </label>
+                            <span className="ml-2 text-xs text-[var(--body)] bg-[#f8fafc] px-2 py-0.5 rounded">Adds an image block to the layout</span>
+                        </div>
                     </div>
 
                     {/* Syntax Editor */}
@@ -160,8 +175,19 @@ export const TemplateBuilderPage = () => {
                             className="bg-white rounded-sm shadow-md w-full max-w-[450px] aspect-[8.5/11] p-6 lg:p-8 overflow-hidden relative"
                             style={{ fontFamily }}
                         >
+                            {/* Profile Image Placeholder */}
+                            {includeImage && (
+                                <div className="absolute top-6 right-6 lg:top-8 lg:right-8 w-14 h-14 bg-[#f1f5f9] border border-[#cbd5e1] rounded flex items-center justify-center text-[8px] text-[#94a3b8] font-bold text-center tracking-wider overflow-hidden">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-50 mb-1">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                        <circle cx="8.5" cy="8.5" r="1.5" />
+                                        <polyline points="21 15 16 10 5 21" />
+                                    </svg>
+                                </div>
+                            )}
+
                             {/* Document Mock Representation based on content */}
-                            <div className="whitespace-pre-wrap text-[10px] md:text-xs leading-relaxed" style={{ color: 'var(--heading)' }}>
+                            <div className="whitespace-pre-wrap text-[10px] md:text-xs leading-relaxed" style={{ color: 'var(--heading)', paddingRight: includeImage ? '60px' : '0' }}>
                                 {content.split('\n').map((line, idx) => {
                                     // Make sections look like headers using the selected accent color
                                     if (line.includes('---')) return <hr key={idx} className="my-2 border-t-2" style={{ borderColor: accentColor }} />;
