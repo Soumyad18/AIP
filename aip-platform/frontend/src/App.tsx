@@ -11,7 +11,7 @@ import { ResumeTemplatesPage } from './pages/ResumeTemplatesPage';
 import { SkillsPage } from './pages/SkillsPage';
 import { UploadResumePage } from './pages/UploadResumePage';
 import { SubscriptionPage } from './pages/SubscriptionPage';
-// import { AboutPage } from './pages/AboutPage';
+import { AboutPage } from './pages/AboutPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardLayout } from './components/DashboardLayout';
 
@@ -43,7 +43,7 @@ export const App = () => (
         <Route path="/skills" element={<SkillsPage />} />
         <Route path="/upload" element={<UploadResumePage />} />
         <Route path="/subscription" element={<SubscriptionPage />} />
-        {/* <Route path="/about" element={<AboutPage />} /> */}
+                <Route path="/about" element={<AboutPage />} />
 
         {/* Enterprise Team Features */}
         <Route path="/team" element={<TeamDashboardPage />} />
