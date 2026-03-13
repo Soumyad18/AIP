@@ -166,7 +166,7 @@ const navItems: NavItem[] = [
     { to: '/upload', label: 'Upload Resume', icon: <UploadIcon /> },
     { to: '/templates', label: 'Templates', icon: <TemplatesIcon /> },
     { to: '/subscription', label: 'Subscription', icon: <SubscriptionIcon /> },
-    { to: '/about', label: 'About AIP', icon: <AboutIcon /> },
+    // { to: '/about', label: 'About AIP', icon: <AboutIcon /> },
 ];
 
 const teamNavItems: NavItem[] = [
